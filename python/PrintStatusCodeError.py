@@ -39,15 +39,20 @@ import re
 
 # http://stackoverflow.com/questions/19750096/python-regex-find-a-substring-that-doesnt-contain-a-substring
 # https://regex101.com/r/yY2gG8/1
-
 errorText = ErrorDict[errorcode]
-
-#pattern = r'http(?:(?!http).)*InternalServerError'
 pattern = r'http(?:(?!http).)*' + re.escape(errorText)
-
 errors = re.findall(pattern, content, re.DOTALL)
+
+# TODO: Append or write
+f = open('errorfile.txt', 'w')
 for error in errors :
     print(error)
+    f.write(error + '\n')
+
+f.close()
+
+
+
 
 
 
