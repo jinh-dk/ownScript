@@ -14,11 +14,12 @@ if ($args.Count -eq 0 )
 
 $branch = git branch
 if ($branch -contains '* master') {
-    Write-Host "you are on master branch, which push is not allowed by this script."
+    Write-Host "you are on master branch, where push is not allowed by this script."
     break;
 }
 
 Write-Host " Push the changes..."
+$commitmessage = $args[0]
 git add .
-git commit $commitmessage
+git commit -m $commitmessage
 git push
