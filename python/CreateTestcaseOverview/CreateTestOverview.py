@@ -2,7 +2,8 @@
 #  Create a test overview in csv file
 #  In CSV file, there are 3 columns:    
 #  [Endpoint] [Testcase cover the endpoint]  [number of failed testcase]
-#
+#  
+#  Now the script can also update a google spreadsheet.
 #  Many hardcode 
 #
 
@@ -79,3 +80,101 @@ with open(r'C:\Users\jinxu\Documents\GitHub\KunaiTestExecutor\APICoverageOverVie
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)                                
     for i in range(0, len(APIList)):                                           
         spamwriter.writerow([ APIList[i], APITestCaseList[i], APIFailedTestCaseList[i]])        
+
+
+
+#Update the google spreadsheet
+import datetime
+import httplib2
+#from __future__ import print_function
+#import os
+
+from apiclient import discovery
+from oauth2client import client
+from oauth2client import tools
+from oauth2client.file import Storage
+
+try:
+    import argparse
+    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+except ImportError:
+    flags = None
+
+# If modifying these scopes, delete your previously saved credentials
+# at ~/.credentials/sheets.googleapis.com-python-quickstart.json
+#SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly'
+SCOPES = 'https://www.googleapis.com/auth/spreadsheets'
+CLIENT_SECRET_FILE = 'client_secret.json'
+APPLICATION_NAME = 'Google Sheets API Python Quickstart'
+
+
+def get_credentials():
+    """Gets valid user credentials from storage.
+
+    If nothing has been stored, or if the stored credentials are invalid,
+    the OAuth2 flow is completed to obtain the new credentials.
+
+    Returns:
+        Credentials, the obtained credential.
+    """
+    home_dir = os.path.expanduser('~')
+    credential_dir = os.path.join(home_dir, '.credentials')
+    if not os.path.exists(credential_dir):
+        os.makedirs(credential_dir)
+    credential_path = os.path.join(credential_dir,
+                                   'sheets.googleapis.com-python-quickstart.json')
+
+    store = Storage(credential_path)
+    credentials = store.get()
+    if not credentials or credentials.invalid:
+        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+        flow.user_agent = APPLICATION_NAME
+        if flags:
+            credentials = tools.run_flow(flow, store, flags)
+        else: # Needed only for compatibility with Python 2.6
+            credentials = tools.run(flow, store)
+        print('Storing credentials to ' + credential_path)
+    return credentials
+    
+credentials = get_credentials()
+http = credentials.authorize(httplib2.Http())
+discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
+                'version=v4')
+service = discovery.build('sheets', 'v4', http=http,
+                            discoveryServiceUrl=discoveryUrl)
+
+spreadsheetId = '1KcpQz3oEj9jQOXc2feI-veEJ-D1PwTrITvhRgNI8bFM'    
+
+rangeName = "A1:C1"
+_body = {
+        "range" :rangeName,
+        "majorDimension": "ROWS" ,
+        "values": [
+            ["API Name",  "Number of testcase to cover", "Number of failed testcase"]
+        ],
+    }
+request = service.spreadsheets().values().update(
+    spreadsheetId=spreadsheetId, valueInputOption="RAW", range=rangeName, body=_body).execute()
+
+## Use len(APIList)+1 to add the last row "Lastupdate:"  ##
+for i in range(0, len(APIList)+1):
+    rangeName = "A"+str(i+2) + ":C"+str(i+2)
+    if i != len(APIList)+1:
+        _body = {
+            "range" :rangeName,
+            "majorDimension":"ROWS",
+            "values": [
+                [APIList[i], APITestCaseList[i], APIFailedTestCaseList[i]]
+            ],
+        }
+    else:
+        now = datetime.datetime.now()
+        _body = {
+            "range" :rangeName,
+            "majorDimension":"ROWS",
+            "values": [
+                ["Last Update:", "", now]
+            ],
+        }
+    request = service.spreadsheets().values().update(
+        spreadsheetId=spreadsheetId, valueInputOption="RAW", range=rangeName, body=_body).execute()
