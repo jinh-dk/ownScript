@@ -159,7 +159,8 @@ request = service.spreadsheets().values().update(
 ## Use len(APIList)+1 to add the last row "Lastupdate:"  ##
 for i in range(0, len(APIList)+1):
     rangeName = "A"+str(i+2) + ":C"+str(i+2)
-    if i != len(APIList)+1:
+    print(str(i+1) + "out of " + str(len(APIList)))
+    if i != len(APIList):
         _body = {
             "range" :rangeName,
             "majorDimension":"ROWS",
@@ -168,12 +169,14 @@ for i in range(0, len(APIList)+1):
             ],
         }
     else:
-        now = datetime.datetime.now()
+        print("yyy")
+        now = str(datetime.datetime.now())
+        print(now)
         _body = {
             "range" :rangeName,
             "majorDimension":"ROWS",
             "values": [
-                ["Last Update:", "", now]
+                ["Last Update:", " ", now]
             ],
         }
     request = service.spreadsheets().values().update(
