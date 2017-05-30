@@ -1,6 +1,6 @@
 from __future__ import print_function
 import httplib2
-import os,sys
+import os, sys
 
 from apiclient import discovery
 from oauth2client import client
@@ -8,8 +8,9 @@ from oauth2client import tools
 from oauth2client.file import Storage
 
 try:
-    import argparse
-    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+    #import argparse
+    #flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+    flags = None
 except ImportError:
     flags = None
 
@@ -52,33 +53,36 @@ def get_credentials():
 def main():
     """Shows basic usage of the Sheets API.
 
-    Creates a Sheets API service object and prints the names and majors of
+    Write a row to google spreadsheet
+    User need make sure the data are provide correctly, otherwise exception may happen
 
-    students in a sample spreadsheet:
-    https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+    argv[1] : spreadsheet id
+    argv[2] : range
+    argv[3 : ]  each argument is a data of a cell.
+         
     """
+
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
                     'version=v4')
     service = discovery.build('sheets', 'v4', http=http,
-                              discoveryServiceUrl=discoveryUrl)
-    
+                                discoveryServiceUrl=discoveryUrl)
+
     spreadsheetId = sys.argv[1]    
-
-    
-    data = []
-    for i in range(1,50000):
-        rangeName = 'A'+str(i)+':'+ sys.argv[2]+str(i)
-        result = service.spreadsheets().values().get(
-            spreadsheetId=spreadsheetId, range=rangeName).execute()
-        values = result.get('values', [])
-        if not values:
-            break
-        else:
-            data.append(values)
-
-    return data
+    _rangeName = sys.argv[2]
+    _values = []
+    for _data in sys.argv[3:] :
+        _values.append(_data)
+    _body = {
+            "range" :_rangeName,
+            "majorDimension": "ROWS" ,
+            "values": [
+                _values
+            ]
+        }
+    request = service.spreadsheets().values().update(
+        spreadsheetId=spreadsheetId, valueInputOption="RAW", range=_rangeName, body=_body).execute()
 
 if __name__ == '__main__':
     main()

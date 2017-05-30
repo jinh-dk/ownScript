@@ -54,17 +54,14 @@ from googleapiclient.http import MediaFileUpload
 def main():
     """Shows basic usage of the Google Drive API.
 
-    Creates a Google Drive API service object and outputs the names and IDs
-    for up to 10 files.
+    Write the local log file to a google docs file. 
+    The id of google docs file are hardcoded.
+
     """
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('drive', 'v3', http=http)
-
-    #file_metadata = { 'name' : 'backend.log',
-    #                  'mimeType' : 'text/plain'
-    #} 
-
+    
     file_metadata = {
         'modifiedTime' : datetime.datetime.utcnow().isoformat() + 'Z'
     }

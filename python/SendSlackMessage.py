@@ -11,8 +11,8 @@ f.close()
 
 botToken = token
 botUsername = "@jinxu"
-botChannel = "G396UA2RY"
-#botChannel = "@jinxu"
+#botChannel = "G396UA2RY"
+botChannel = "@jinxu"
 
 f = open('errorfile.txt', 'r');
 
