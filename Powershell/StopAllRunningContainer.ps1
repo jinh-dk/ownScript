@@ -1,0 +1,1 @@
+﻿docker.exe stop $(docker ps -aq)
