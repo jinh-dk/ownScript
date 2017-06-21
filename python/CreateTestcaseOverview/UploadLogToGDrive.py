@@ -2,6 +2,7 @@ from __future__ import print_function
 import datetime
 import httplib2
 import os
+import sys
 
 from apiclient import discovery
 from oauth2client import client
@@ -66,7 +67,9 @@ def main():
         'modifiedTime' : datetime.datetime.utcnow().isoformat() + 'Z'
     }
 
-    media = MediaFileUpload(sys.argv[1],
+    # use raw input for path
+    # https://stackoverflow.com/questions/17438852/pass-in-string-as-argument-without-it-being-treated-as-raw
+    media = MediaFileUpload(sys.argv[1].decode('string_escape'),
                         mimetype='text/plain',
                         resumable=True)                        
     file_id = sys.argv[2]
