@@ -13,11 +13,13 @@ import re
 
 apipattern = r'/*<description>\s*(/api/.*)\s*</description>*'
 testcasepattern = r'.*\s(\w+Test).*'
-IntegrationTestcaseFolder = r"C:\Users\jinxu\Documents\GitHub\kunaiDev\Kunai\test\Publishing.Api.IntegrationTest"
+# IntegrationTestcaseFolder = r"C:\Users\jinxu\Documents\GitHub\kunaiDev\Kunai\test\Publishing.Api.IntegrationTest"
+IntegrationTestcaseFolder = r"C:\Users\jinxu\Documents\GitHub\kunai\dev\itest\test\Publishing.Api.IntegrationTest"
 
 
 ### Read the API list file  ###
-with open(r'C:\Users\jinxu\Documents\GitHub\KunaiTestExecutor\APIs.txt', 'r') as f:
+#with open(r'C:\Users\jinxu\Documents\GitHub\KunaiTestExecutor\APIs.txt', 'r') as f:
+with open(r'C:\Users\jinxu\Documents\GitHub\kunai\test\data\APIs.txt', 'r') as f:
     APIList = f.read().splitlines() 
 
 APITestCaseList = [0] * len(APIList)
@@ -60,7 +62,8 @@ for filename in os.listdir(IntegrationTestcaseFolder):
 
 # read the Test Result files.
 import xml.etree.ElementTree as ET
-testresult = ET.parse(r'C:\Users\jinxu\Documents\GitHub\KunaiTestExecutor\integrationTest.xml').getroot()
+#testresult = ET.parse(r'C:\Users\jinxu\Documents\GitHub\KunaiTestExecutor\integrationTest.xml').getroot()
+testresult = ET.parse(r'C:\Users\jinxu\Documents\GitHub\kunai\test\result\integrationTest.xml').getroot()
 for test in testresult.findall('.//assembly/collection/test'):
     if (test.get('result') == "Fail"):
         ## Where the testcase is failed, read the dictionary to get the list of endpoint that testcase covered.
@@ -75,7 +78,8 @@ if (len(APIList) != len(APITestCaseList)):
     print('Wrong!')
 
 import csv
-with open(r'C:\Users\jinxu\Documents\GitHub\KunaiTestExecutor\APICoverageOverView.txt', 'w', newline='') as csvfile:
+#with open(r'C:\Users\jinxu\Documents\GitHub\KunaiTestExecutor\APICoverageOverView.txt', 'w', newline='') as csvfile:
+with open(r'C:\Users\jinxu\Documents\GitHub\kunai\test\result\APICoverageOverView.txt', 'w', newline='') as csvfile:
     spamwriter = csv.writer(csvfile, delimiter=',',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)                                
     for i in range(0, len(APIList)):                                           

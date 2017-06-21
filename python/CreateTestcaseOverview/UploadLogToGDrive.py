@@ -66,27 +66,14 @@ def main():
         'modifiedTime' : datetime.datetime.utcnow().isoformat() + 'Z'
     }
 
-    media = MediaFileUpload(r'C:\Users\jinxu\Documents\GitHub\KunaiLog\Backend.log',
+    media = MediaFileUpload(sys.argv[1],
                         mimetype='text/plain',
                         resumable=True)                        
-    file_id = "1iecekG5Rlnme9rfJ4PWP1KPUh1Kt8JOLIMcJHIeZmvk"
+    file_id = sys.argv[2]
     results = service.files().update(fileId= file_id,
                                     media_body=media,
                                     body=file_metadata,                                    
                                     fields='id, modifiedTime').execute()
-    
-
-    ## Upload Frontend
-    media = MediaFileUpload(r'C:\Users\jinxu\Documents\GitHub\KunaiLog\Frontend.log',
-                        mimetype='text/plain',
-                        resumable=True)  
-                         
-    file_id = "1CmjkWFjPUQZJmEHqgnFhruFMyfR2Gxm8EDGmUKPaMbY"
-    results = service.files().update(fileId= file_id,
-                                    media_body=media,
-                                    body=file_metadata,                                    
-                                    fields='id, modifiedTime').execute()
-
 
 if __name__ == '__main__':
     main()
