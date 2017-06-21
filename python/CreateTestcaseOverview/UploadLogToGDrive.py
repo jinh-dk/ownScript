@@ -9,11 +9,12 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 
-try:
-    import argparse
-    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
-except ImportError:
-    flags = None
+#try:
+#    import argparse
+#    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+#except ImportError:'
+
+flags = None
 
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/drive-python-quickstart.json
@@ -52,7 +53,7 @@ def get_credentials():
 
 from googleapiclient.http import MediaFileUpload
 
-def main():
+def upload(path, id):
     """Shows basic usage of the Google Drive API.
 
     Write the local log file to a google docs file. 
@@ -69,14 +70,15 @@ def main():
 
     # use raw input for path
     # https://stackoverflow.com/questions/17438852/pass-in-string-as-argument-without-it-being-treated-as-raw
-    media = MediaFileUpload(sys.argv[1].decode('string_escape'),
+
+    media = MediaFileUpload(path,
                         mimetype='text/plain',
                         resumable=True)                        
-    file_id = sys.argv[2]
+    file_id = id
     results = service.files().update(fileId= file_id,
                                     media_body=media,
                                     body=file_metadata,                                    
                                     fields='id, modifiedTime').execute()
 
-if __name__ == '__main__':
-    main()
+if __name__ == '__main__':    
+    upload(sys.argv[1], sys.argv[2])
