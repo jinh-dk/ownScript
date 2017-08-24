@@ -2,3 +2,4 @@ slacktoken.txt
 *errorfile.txt
 python/slackclient/
 client_secret.json
+settings.json

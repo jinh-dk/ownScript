@@ -1,8 +1,12 @@
 ﻿<#
     write the container name in argments, will remove all the container, and its image
 #>
+Write-Host $PSScriptRoot
 
 foreach ($arg in $args) 
-{
-    RemoveContainterAndImage.ps1 $arg
+{    
+    Push-Location $PSScriptRoot
+    $cmd = "$PSScriptRoot\RemoveContainerAndImage.ps1 $arg"
+    Invoke-Expression $cmd
+    Pop-Location
 }

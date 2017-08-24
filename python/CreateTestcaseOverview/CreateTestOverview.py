@@ -13,12 +13,10 @@ import re
 
 apipattern = r'/*<description>\s*(/api/.*)\s*</description>*'
 testcasepattern = r'.*\s(\w+Test).*'
-# IntegrationTestcaseFolder = r"C:\Users\jinxu\Documents\GitHub\kunaiDev\Kunai\test\Publishing.Api.IntegrationTest"
 IntegrationTestcaseFolder = r"C:\Users\jinxu\Documents\GitHub\kunai\dev\itest\test\Publishing.Api.IntegrationTest"
 
 
 ### Read the API list file  ###
-#with open(r'C:\Users\jinxu\Documents\GitHub\KunaiTestExecutor\APIs.txt', 'r') as f:
 with open(r'C:\Users\jinxu\Documents\GitHub\kunai\test\data\APIs.txt', 'r') as f:
     APIList = f.read().splitlines() 
 
@@ -45,7 +43,8 @@ for filename in os.listdir(IntegrationTestcaseFolder):
                 ## m need non-empty ##
                 if m:                    
                     EndPointList.append(m.group(1))
-            elif 'Test()' in line and isEndPoinstFound:
+            # Because of Theory type, only looking for Test(
+            elif 'Test(' in line and isEndPoinstFound:
                 ## When there is a testcase, summerize, and clear ##
                 isEndPoinstFound = False                                
                 m = re.search(testcasepattern, line)
@@ -62,12 +61,15 @@ for filename in os.listdir(IntegrationTestcaseFolder):
 
 # read the Test Result files.
 import xml.etree.ElementTree as ET
-#testresult = ET.parse(r'C:\Users\jinxu\Documents\GitHub\KunaiTestExecutor\integrationTest.xml').getroot()
 testresult = ET.parse(r'C:\Users\jinxu\Documents\GitHub\kunai\test\result\integrationTest.xml').getroot()
 for test in testresult.findall('.//assembly/collection/test'):
     if (test.get('result') == "Fail"):
         ## Where the testcase is failed, read the dictionary to get the list of endpoint that testcase covered.
-        _list = Testcase2apiDict[ test.get('name')[len('Unity.Publishing.Api.IntegrationTest.'):] ]
+        # If test cace name contains (, meaning it is a Theory type testcase, get the testcase part before (
+        if  ('(' in test.get('name')) : 
+            _list = Testcase2apiDict[ test.get('name')[len('Unity.Publishing.Api.IntegrationTest.'): test.get('name').index('(')] ]
+        else: 
+            _list = Testcase2apiDict[ test.get('name')[len('Unity.Publishing.Api.IntegrationTest.'):] ]
         for ep in _list:            
             idx = APIList.index(ep)
             APIFailedTestCaseList[idx] = APIFailedTestCaseList[idx] + 1        
@@ -78,7 +80,6 @@ if (len(APIList) != len(APITestCaseList)):
     print('Wrong!')
 
 import csv
-#with open(r'C:\Users\jinxu\Documents\GitHub\KunaiTestExecutor\APICoverageOverView.txt', 'w', newline='') as csvfile:
 with open(r'C:\Users\jinxu\Documents\GitHub\kunai\test\result\APICoverageOverView.txt', 'w', newline='') as csvfile:
     spamwriter = csv.writer(csvfile, delimiter=',',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)                                
