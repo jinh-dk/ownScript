@@ -8,24 +8,24 @@ param(
     [string]$filetype = "cs"
 )
 
-Push-Location $outputfilename
-$files = (Get-ChildItem . -Filter '*.$filetype' | Select-Object -ExpandProperty Name)
+Push-Location $folder
+$files = (Get-ChildItem . -Filter "*.$filetype" | Select-Object -ExpandProperty Name)
+Write-Host $files
 foreach ($file in $files)
 {
+    Write-Host $file
     $lines = Get-Content $file
     foreach($line in $lines)
     {
-        if( $line -match '.*public\s+.+Test\(.+' ) 
+        if( $line -match '.*public\s+.+Test\(.+' -or $line -match '////\s*[Ss]tep\s+:') 
         {
             # Write-Test name
-        }
-
-        if($line -match '////\s*[Ss]tep\s+:')
-        {
-            # Write-Test Step
-
+            $content += $line
+            $content += ' `n '  
         }
     }
 }
+Pop-Location
+$content | Set-Content $outputfilename
 
 
