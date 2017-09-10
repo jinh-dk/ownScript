@@ -10,18 +10,31 @@ param(
 
 Push-Location $folder
 $files = (Get-ChildItem . -Filter "*.$filetype" | Select-Object -ExpandProperty Name)
-Write-Host $files
 foreach ($file in $files)
 {
     Write-Host $file
     $lines = Get-Content $file
     foreach($line in $lines)
     {
-        if( $line -match '.*public\s+.+Test\(.+' -or $line -match '////\s*[Ss]tep\s+:') 
+        if( $line -match '.*public\s+.+Test\(.+' ) 
         {
             # Write-Test name
-            $content += $line
-            $content += ' `n '  
+            if ( $line -match "public\s+.+Task")
+            {
+                $content += $line -replace "public\s+.+Task", ""
+            }
+            elseif ($line -match "public\s+void")
+            {
+                $content += $line -replace "public\s+void", ""
+            }
+            $content += "`r`n"  
+        }
+        
+        if( $line -match '////\s*[Ss]tep\s+:') 
+        {
+            # Write-Test name
+            $content += $line -replace "////", ""
+            $content += "`r`n"  
         }
     }
 }
